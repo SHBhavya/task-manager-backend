@@ -11,6 +11,12 @@ class UserCreate(BaseModel):
     email: str
     password: str
 
+# Input when updating a user
+class UserUpdate(BaseModel):
+    name: Optional[str]=None
+    email: Optional[str]=None
+    password: Optional[str]=None
+    
 # Output when returning user
 class UserResponse(BaseModel):
     user_id: int

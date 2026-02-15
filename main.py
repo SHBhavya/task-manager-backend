@@ -47,16 +47,19 @@ def get_user(
 
 @app.put("/users/{user_id}")
 def update_user(
-                user: schemas.UserCreate,
+                user: schemas.UserUpdate,
                 user_id: int = Path(..., gt=0, lt=50),
                 db: Session = Depends(get_db)
 ):
     db_user = db.query(models.User).filter(models.User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
-    db_user.name = user.name
-    db_user.email = user.email
-    db_user.password = user.password
+    if user.name:
+        db_user.name = user.name
+    if user.email:
+        db_user.email = user.email
+    if user.password:
+        db_user.password = user.password
 
     db.commit()
     db.refresh(db_user)
