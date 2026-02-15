@@ -33,4 +33,14 @@ def create_user(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return {"message":"User created!"}
+    return new_user
+
+@app.get("/users/{user_id}")
+def get_user(
+    user_id: int = Path(..., description="The ID you want to get", gt=0, lt=50),
+    db: Session = Depends(get_db)
+):  
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return user
