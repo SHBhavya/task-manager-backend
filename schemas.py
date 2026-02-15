@@ -19,7 +19,7 @@ class UserResponse(BaseModel):
     email: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # ---------- Task Schemas ----------
@@ -49,4 +49,4 @@ class TaskResponse(BaseModel):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
