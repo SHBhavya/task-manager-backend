@@ -11,7 +11,6 @@ class UserCreate(BaseModel):
     email: str
     password: str
 
-
 # Output when returning user
 class UserResponse(BaseModel):
     user_id: int
