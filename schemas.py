@@ -35,7 +35,6 @@ class TaskCreate(BaseModel):
     description: Optional[str] = None
     deadline: Optional[date] = None
 
-
 # Update task
 class TaskUpdate(BaseModel):
     title: Optional[str] = None

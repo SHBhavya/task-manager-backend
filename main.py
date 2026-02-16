@@ -76,3 +76,15 @@ def delete_user(
     db.delete(user)
     db.commit()
     return user
+
+@app.post("/users/{user_id}/tasks")
+def create_task(
+    task: schemas.TaskCreate,
+    user_id: int = Path(..., gt=0,lt=50),
+    db: Session = Depends(get_db)
+):
+    new_task = models.Task(**task.model_dump(), user_id=user_id)
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
+    return new_task
