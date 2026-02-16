@@ -109,3 +109,19 @@ def get_user_tasks(
         raise HTTPException(status_code=404, detail="User not found.")
     tasks = db.query(models.Task).filter(models.Task.user_id == user_id).all()
     return tasks
+
+@app.get("/users/{user_id}/tasks/{task_id}")
+def get_user_task(
+    user_id: int = Path(..., gt=0),
+    task_id: int = Path(..., gt=0),
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")\
+        
+    task = db.query(models.Task).filter(models.Task.task_id == task_id, models.Task.user_id == user_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found.")
+    
+    return task
