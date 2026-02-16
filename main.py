@@ -36,7 +36,7 @@ def create_user(
 
 @app.get("/users/{user_id}")
 def get_user(
-    user_id: int = Path(..., description="The ID you want to get", gt=0, lt=50),
+    user_id: int = Path(..., description="The ID you want to get", gt=0),
     db: Session = Depends(get_db)
 ):  
     user = db.query(models.User).filter(models.User.user_id == user_id).first()
@@ -47,7 +47,7 @@ def get_user(
 @app.put("/users/{user_id}")
 def update_user(
                 user: schemas.UserUpdate,
-                user_id: int = Path(..., gt=0, lt=50),
+                user_id: int = Path(..., gt=0),
                 db: Session = Depends(get_db)
 ):
     db_user = db.query(models.User).filter(models.User.user_id == user_id).first()
@@ -67,7 +67,7 @@ def update_user(
 
 @app.delete("/users/{user_id}")
 def delete_user(
-    user_id: int = Path(..., gt=0, lt=50),
+    user_id: int = Path(..., gt=0),
     db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.user_id == user_id).first()
@@ -80,9 +80,12 @@ def delete_user(
 @app.post("/users/{user_id}/tasks")
 def create_task(
     task: schemas.TaskCreate,
-    user_id: int = Path(..., gt=0,lt=50),
+    user_id: int = Path(..., gt=0),
     db: Session = Depends(get_db)
 ):
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
     new_task = models.Task(**task.model_dump(), user_id=user_id)
     db.add(new_task)
     db.commit()
