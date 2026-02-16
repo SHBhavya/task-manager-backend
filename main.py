@@ -56,14 +56,12 @@ def update_user(
                 db: Session = Depends(get_db)
 ):
     db_user = db.query(models.User).filter(models.User.user_id == user_id).first()
-    if not user:
+    if not db_user:
         raise HTTPException(status_code=404, detail="User not found.")
-    if user.name:
-        db_user.name = user.name
-    if user.email:
-        db_user.email = user.email
-    if user.password:
-        db_user.password = user.password
+    update_data = user.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
 
     db.commit()
     db.refresh(db_user)
@@ -118,10 +116,35 @@ def get_user_task(
 ):
     user = db.query(models.User).filter(models.User.user_id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found.")\
+        raise HTTPException(status_code=404, detail="User not found.")
         
     task = db.query(models.Task).filter(models.Task.task_id == task_id, models.Task.user_id == user_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found.")
     
     return task
+
+@app.put("/users/{user_id}/tasks/{task_id}")
+def update_user_task(
+                task: schemas.TaskUpdate,
+                user_id: int = Path(..., gt=0),
+                task_id: int = Path(..., gt=0),
+                db: Session = Depends(get_db)
+):
+    db_user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    db_task = db.query(models.Task).filter(models.Task.user_id == user_id, models.Task.task_id == task_id).first()
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found.")
+    
+    update_data = task.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(db_task, key, value)
+
+    db.commit()
+    db.refresh(db_task)
+
+    return db_task
