@@ -75,6 +75,7 @@ def delete_user(
         raise HTTPException(status_code=404, detail="User not found.")
     db.delete(user)
     db.commit()
+
     return user
 
 @app.post("/users/{user_id}/tasks")
@@ -90,4 +91,5 @@ def create_task(
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
+    
     return new_task
