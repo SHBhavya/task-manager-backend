@@ -91,5 +91,16 @@ def create_task(
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
-    
+
     return new_task
+
+@app.get("/users/{user_id}/tasks")
+def get_user_tasks(
+    user_id: int = Path(..., gt=0),
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    tasks = db.query(models.Task).filter(models.Task.user_id == user_id).all()
+    return tasks
