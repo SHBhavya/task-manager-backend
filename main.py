@@ -34,6 +34,11 @@ def create_user(
     db.refresh(new_user)
     return new_user
 
+@app.get("/users")
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    return users
+
 @app.get("/users/{user_id}")
 def get_user(
     user_id: int = Path(..., description="The ID you want to get", gt=0),
