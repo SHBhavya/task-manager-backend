@@ -148,3 +148,20 @@ def update_user_task(
     db.refresh(db_task)
 
     return db_task
+
+@app.delete("/users/{user_id}/tasks/{task_id}")
+def delete_user_task(
+                user_id: int = Path(..., gt=0),
+                task_id: int = Path(..., gt=0),
+                db: Session = Depends(get_db)
+            ):
+    db_user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    db_task = db.query(models.Task).filter(models.Task.user_id == user_id, models.Task.task_id == task_id).first()
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found.")
+    db.delete(db_task)
+    db.commit()
+    return db_task
