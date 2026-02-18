@@ -165,3 +165,23 @@ def delete_user_task(
     db.delete(db_task)
     db.commit()
     return {"detail": "Task deleted"}
+
+@app.get("/users/{user_id}/tasks")
+def get_user_tasks(
+    user_id: int,
+    status: str = None,
+    search: str = None,
+    db: Session = Depends(get_db)
+):
+    tasks = db.query(models.Task).filter(
+        models.Task.user_id == user_id
+    )
+    if status:
+        tasks = tasks.filter(models.Task.status == status)
+
+    if search:
+        tasks = tasks.filter(
+            models.Task.title.contains(search)
+        )
+
+    return tasks.all()
