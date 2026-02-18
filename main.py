@@ -171,6 +171,9 @@ def get_user_tasks(
     user_id: int,
     status: str = None,
     search: str = None,
+    skip: int = 0,
+    limit: int = 10,
+    sort_by: str = "task_id",
     db: Session = Depends(get_db)
 ):
     tasks = db.query(models.Task).filter(
@@ -183,5 +186,9 @@ def get_user_tasks(
         tasks = tasks.filter(
             models.Task.title.contains(search)
         )
+    if sort_by == "deadline":
+        tasks = tasks.order_by(models.Task.deadline)
+    else:
+        tasks = tasks.order_by(models.Task.task_id)
 
-    return tasks.all()
+    return tasks.offset(skip).limit(limit).all()
