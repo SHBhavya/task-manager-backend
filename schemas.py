@@ -1,6 +1,13 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
+from enum import Enum
+
+
+class TaskStatus(str, Enum):
+    pending = "pending"
+    in_progress = "in_progress"
+    completed = "completed"
 
 
 # ---------- User Schemas ----------
@@ -34,12 +41,13 @@ class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
     deadline: Optional[date] = None
+    status: TaskStatus
 
 # Update task
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[TaskStatus] = None
     deadline: Optional[date] = None
 
 
