@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Path, HTTPException, Depends
+from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal
 import models, schemas
@@ -169,26 +170,13 @@ def delete_user_task(
 @app.get("/users/{user_id}/tasks")
 def get_user_tasks(
     user_id: int,
-    status: str = None,
-    search: str = None,
-    skip: int = 0,
-    limit: int = 10,
-    sort_by: str = "task_id",
     db: Session = Depends(get_db)
 ):
     tasks = db.query(models.Task).filter(
         models.Task.user_id == user_id
+    ).order_by(
+        models.Task.status.desc(),
+        models.Task.deadline.asc()
     )
-    if status:
-        tasks = tasks.filter(models.Task.status == status)
 
-    if search:
-        tasks = tasks.filter(
-            models.Task.title.contains(search)
-        )
-    if sort_by == "deadline":
-        tasks = tasks.order_by(models.Task.deadline)
-    else:
-        tasks = tasks.order_by(models.Task.task_id)
-
-    return tasks.offset(skip).limit(limit).all()
+    return tasks.all()
