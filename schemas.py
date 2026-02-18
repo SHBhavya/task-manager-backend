@@ -41,7 +41,7 @@ class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
     deadline: Optional[date] = None
-    status: TaskStatus
+    status: TaskStatus = TaskStatus.pending
 
 # Update task
 class TaskUpdate(BaseModel):
