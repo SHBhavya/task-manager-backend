@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, HTTPException, Depends
+from fastapi import FastAPI, Path, HTTPException, Depends, Query
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal
@@ -98,17 +98,6 @@ def create_task(
 
     return new_task
 
-@app.get("/users/{user_id}/tasks")
-def get_user_tasks(
-    user_id: int = Path(..., gt=0),
-    db: Session = Depends(get_db)
-):
-    user = db.query(models.User).filter(models.User.user_id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-    tasks = db.query(models.Task).filter(models.Task.user_id == user_id).all()
-    return tasks
-
 @app.get("/users/{user_id}/tasks/{task_id}")
 def get_user_task(
     user_id: int = Path(..., gt=0),
@@ -170,13 +159,30 @@ def delete_user_task(
 @app.get("/users/{user_id}/tasks")
 def get_user_tasks(
     user_id: int,
+    status: str = None,
+    search: str = None,
+    sort: str = "deadline",
+    limit: int = 2,
+    offset: int = 0,
     db: Session = Depends(get_db)
 ):
     tasks = db.query(models.Task).filter(
         models.Task.user_id == user_id
-    ).order_by(
-        models.Task.status.desc(),
-        models.Task.deadline.asc()
     )
 
-    return tasks.all()
+    if status:
+        tasks = tasks.filter(models.Task.status == status)
+
+    if search:
+        tasks = tasks.filter(
+            models.Task.title.contains(search)
+        )
+
+    if sort == "deadline":
+        tasks = tasks.order_by(models.Task.deadline)
+
+    tasks = tasks.limit(limit).offset(offset).all()
+    if not tasks:
+        raise HTTPException(status_code=404, detail="No tasks found")
+
+    return tasks
