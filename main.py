@@ -175,7 +175,7 @@ def get_user_tasks(
 
     if search:
         tasks = tasks.filter(
-            models.Task.title.contains(search)
+            models.Task.title.ilike(f"%{search}%")
         )
 
     if sort == "deadline":
