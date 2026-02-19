@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Path, HTTPException, Depends, Query
-from sqlalchemy import asc, desc
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal
 import models, schemas
@@ -175,7 +175,10 @@ def get_user_tasks(
 
     if search:
         tasks = tasks.filter(
-            models.Task.title.ilike(f"%{search}%")
+            or_(
+            models.Task.title.ilike(f"%{search}%"),
+            models.Task.description.ilike(f"%{search}%")
+        )
         )
 
     if sort == "deadline":
