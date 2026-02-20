@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Boolean
 from database import Base
 from sqlalchemy.sql import func
 
@@ -10,6 +10,7 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
     password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
 
 class Task(Base):
     __tablename__ = "tasks"
