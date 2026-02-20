@@ -156,6 +156,7 @@ def delete_user_task(
     db.commit()
     return {"detail": "Task deleted"}
 
+
 @app.get("/users/{user_id}/tasks")
 def get_user_tasks(
     user_id: int,
@@ -180,12 +181,16 @@ def get_user_tasks(
             models.Task.description.ilike(f"%{search}%")
         )
         )
-
+    total = tasks.count()
+    
     if sort == "deadline":
         tasks = tasks.order_by(models.Task.deadline)
 
-    tasks = tasks.limit(limit).offset(offset).all()
-    if not tasks:
-        raise HTTPException(status_code=404, detail="No tasks found")
-
-    return tasks
+    tasks = tasks.offset(offset).limit(limit).all()
+    
+    return {
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "data": tasks
+    }
