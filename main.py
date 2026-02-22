@@ -8,3 +8,6 @@ app.include_router(tasks.router)
 
 Base.metadata.create_all(bind=engine)
 
+@app.get("/")
+def home():
+    return {"message": "API is running"}

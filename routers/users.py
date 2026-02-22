@@ -9,10 +9,6 @@ router = APIRouter(
     tags=["Tasks"]
 )
 
-@router.get("/")
-def home():
-    return {"message":"API is running"}
-
 @router.post("/")
 def create_user(
     user: schemas.UserCreate,
