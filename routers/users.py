@@ -4,13 +4,16 @@ from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal, get_db
 import models, schemas
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["Tasks"]
+)
 
 @router.get("/")
 def home():
     return {"message":"API is running"}
 
-@router.post("/users")
+@router.post("/")
 def create_user(
     user: schemas.UserCreate,
     db: Session = Depends(get_db)
@@ -25,12 +28,12 @@ def create_user(
     db.refresh(new_user)
     return new_user
 
-@router.get("/users")
+@router.get("/")
 def get_users(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     return users
 
-@router.get("/users/{user_id}")
+@router.get("/{user_id}")
 def get_user(
     user_id: int = Path(..., description="The ID you want to get", gt=0),
     db: Session = Depends(get_db)
@@ -40,7 +43,7 @@ def get_user(
         raise HTTPException(status_code=404, detail="User not found.")
     return user
 
-@router.put("/users/{user_id}")
+@router.put("/{user_id}")
 def update_user(
                 user: schemas.UserUpdate,
                 user_id: int = Path(..., gt=0),
@@ -59,7 +62,7 @@ def update_user(
 
     return db_user
 
-@router.delete("/users/{user_id}")
+@router.delete("/{user_id}")
 def delete_user(
     user_id: int = Path(..., gt=0),
     db: Session = Depends(get_db)

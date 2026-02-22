@@ -4,8 +4,12 @@ from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal, get_db
 import models, schemas
 
-router = APIRouter()
-@router.post("/users/{user_id}/tasks")
+router = APIRouter(
+    prefix="/users/{user_id}/tasks",
+    tags=["Tasks"]
+)
+
+@router.post("/")
 def create_task(
     task: schemas.TaskCreate,
     user_id: int = Path(..., gt=0),
@@ -21,7 +25,7 @@ def create_task(
 
     return new_task
 
-@router.get("/users/{user_id}/tasks/{task_id}")
+@router.get("/{task_id}")
 def get_user_task(
     user_id: int = Path(..., gt=0),
     task_id: int = Path(..., gt=0),
@@ -37,7 +41,7 @@ def get_user_task(
     
     return task
 
-@router.put("/users/{user_id}/tasks/{task_id}")
+@router.put("/{task_id}")
 def update_user_task(
                 task: schemas.TaskUpdate,
                 user_id: int = Path(..., gt=0),
@@ -62,7 +66,7 @@ def update_user_task(
 
     return db_task
 
-@router.delete("/users/{user_id}/tasks/{task_id}")
+@router.delete("/{task_id}")
 def delete_user_task(
                 user_id: int = Path(..., gt=0),
                 task_id: int = Path(..., gt=0),
@@ -80,7 +84,7 @@ def delete_user_task(
     return {"detail": "Task deleted"}
 
 
-@router.get("/users/{user_id}/tasks")
+@router.get("/")
 def get_user_tasks(
     user_id: int,
     status: str = None,
