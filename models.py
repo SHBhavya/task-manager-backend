@@ -1,4 +1,3 @@
-
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Boolean, Enum
 from database import Base
 from sqlalchemy.sql import func
