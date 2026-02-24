@@ -24,15 +24,13 @@ class UserUpdate(BaseModel):
     email: Optional[str]=None
     password: Optional[str]=None
     
+
 # Output when returning user
 class UserResponse(BaseModel):
     user_id: int
     name: str
     email: str
-
-    class Config:
-        from_attributes = True
-
+    is_active: bool
 
 # ---------- Task Schemas ----------
 

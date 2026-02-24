@@ -28,7 +28,7 @@ def login(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/")
+@router.post("/", response_model=schemas.UserResponse)
 def create_user(
     user: schemas.UserCreate,
     db: Session = Depends(get_db)
