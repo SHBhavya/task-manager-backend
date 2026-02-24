@@ -32,6 +32,9 @@ class UserResponse(BaseModel):
     email: str
     is_active: bool
 
+    class Config:
+        from_attributes = True
+
 # ---------- Task Schemas ----------
 
 # Create task input
@@ -54,7 +57,7 @@ class TaskResponse(BaseModel):
     task_id: int
     title: str
     description: Optional[str]
-    status: str
+    status: TaskStatus
     deadline: Optional[date]
     user_id: int
 
