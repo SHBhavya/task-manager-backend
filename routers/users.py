@@ -73,37 +73,16 @@ def get_me(
     return current_user
 
 
-@router.get("/{user_id}", response_model=schemas.UserResponse)
-def get_user(
-    user_id: int = Path(..., description="The ID you want to get", gt=0),
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
-    user = db.query(models.User).filter(
-        models.User.user_id == user_id
-    ).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
-    return user
-
-
-@router.put("/{user_id}", response_model=schemas.UserResponse)
+@router.put("/me", response_model=schemas.UserResponse)
 def update_user(
     user: schemas.UserUpdate,
-    user_id: int = Path(..., gt=0),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
-
+    
     db_user = db.query(models.User).filter(
-        models.User.user_id == user_id
+        models.User.user_id == current_user.user_id
     ).first()
 
     if not db_user:
@@ -124,17 +103,14 @@ def update_user(
     return db_user
 
 
-@router.delete("/{user_id}")
+@router.delete("/me")
 def delete_user(
-    user_id: int = Path(..., gt=0),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
     user = db.query(models.User).filter(
-        models.User.user_id == user_id
+        models.User.user_id == current_user.user_id
     ).first()
 
     if not user:

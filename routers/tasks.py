@@ -6,22 +6,18 @@ import models, schemas
 from auth import get_current_user
 
 router = APIRouter(
-    prefix="/users/{user_id}/tasks",
+    prefix="/tasks",
     tags=["Tasks"]
 )
 
 
-@router.post("/")
+@router.post("/", response_model=schemas.TaskResponse)
 def create_task(
     task: schemas.TaskCreate,
-    user_id: int = Path(..., gt=0),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # 🔐 Ensure logged-in user matches path user_id
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
-
+    
     new_task = models.Task(
         title=task.title,
         description=task.description,
@@ -35,42 +31,17 @@ def create_task(
     return new_task
 
 
-@router.get("/{task_id}")
-def get_user_task(
-    user_id: int = Path(..., gt=0),
-    task_id: int = Path(..., gt=0),
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    # 🔐 Authorization check
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
-    task = db.query(models.Task).filter(
-        models.Task.task_id == task_id,
-        models.Task.user_id == user_id
-    ).first()
-
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found.")
-
-    return task
-
-
-@router.put("/{task_id}")
+@router.put("/{task_id}", response_model=schemas.TaskResponse)
 def update_user_task(
     task: schemas.TaskUpdate,
-    user_id: int = Path(..., gt=0),
     task_id: int = Path(..., gt=0),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # 🔐 Authorization check
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
     db_task = db.query(models.Task).filter(
-        models.Task.user_id == user_id,
+        models.Task.user_id == current_user.user_id,
         models.Task.task_id == task_id
     ).first()
 
@@ -90,17 +61,14 @@ def update_user_task(
 
 @router.delete("/{task_id}")
 def delete_user_task(
-    user_id: int = Path(..., gt=0),
     task_id: int = Path(..., gt=0),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # 🔐 Authorization check
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    
 
     db_task = db.query(models.Task).filter(
-        models.Task.user_id == user_id,
+        models.Task.user_id == current_user.user_id,
         models.Task.task_id == task_id
     ).first()
 
@@ -115,7 +83,6 @@ def delete_user_task(
 
 @router.get("/")
 def get_user_tasks(
-    user_id: int = Path(..., gt=0),
     status: str = None,
     search: str = None,
     sort: str = "deadline",
@@ -124,12 +91,9 @@ def get_user_tasks(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # 🔐 Authorization check
-    if current_user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
     tasks = db.query(models.Task).filter(
-        models.Task.user_id == user_id
+        models.Task.user_id == current_user.user_id
     )
 
     if status:

@@ -1,13 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
-from enum import Enum
-
-
-class TaskStatus(str, Enum):
-    pending = "pending"
-    in_progress = "in_progress"
-    completed = "completed"
+from enums import TaskStatus
 
 
 # ---------- User Schemas ----------
