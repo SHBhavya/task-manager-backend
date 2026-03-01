@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from database import engine, Base, SessionLocal
-from routers import tasks, users
+from database import engine, Base
+from routers import tasks, users, auth
+from models import User 
 
 app = FastAPI()
+app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(tasks.router)
 
