@@ -3,7 +3,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal, get_db
 import models, schemas
-from core.security import get_current_user
+from core.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/tasks",
