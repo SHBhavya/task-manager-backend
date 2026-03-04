@@ -5,9 +5,8 @@ from database import get_db
 from jose import JWTError, jwt
 import models, schemas
 
+from core.config import SECRET_KEY, ALGORITHM
 from core.security import (
-    SECRET_KEY,
-    ALGORITHM,
     hash_password,
     verify_password,
     create_access_token,
